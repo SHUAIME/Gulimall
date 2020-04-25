@@ -14,7 +14,7 @@
     </properties>
     <modules>
         <module>gulimall-coupon</module>
-        <module>gulimall-meber</module>
+        <module>gulimall-member</module>
         <module>gulimall-order</module>
         <module>gulimall-product</module>
         <module>gulimall-ware</module>

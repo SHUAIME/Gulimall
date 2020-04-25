@@ -1,6 +1,5 @@
 package com.yan.gulimall.product.controller;
 
-import com.yan.common.utils.PageUtils;
 import com.yan.common.utils.R;
 import com.yan.gulimall.product.entity.CategoryEntity;
 import com.yan.gulimall.product.service.CategoryService;
@@ -8,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -26,14 +26,14 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 列表
+     * 查出所有分类列表以及子分类,以树形结构组装起来
      */
-    @RequestMapping("/list")
-    //@RequiresPermissions("product:category:list")
+    @RequestMapping("/list/tree")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryService.queryPage(params);
 
-        return R.ok().put("page", page);
+        List<CategoryEntity> entities = categoryService.listWithTree();
+
+        return R.ok().put("data", entities);
     }
 
 
@@ -45,7 +45,7 @@ public class CategoryController {
     public R info(@PathVariable("catId") Long catId){
 		CategoryEntity category = categoryService.getById(catId);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
@@ -56,6 +56,12 @@ public class CategoryController {
     public R save(@RequestBody CategoryEntity category){
 		categoryService.save(category);
 
+        return R.ok();
+    }
+
+    @RequestMapping("/update/sort")
+    public R updateSort(@RequestBody CategoryEntity[] category){
+        categoryService.updateBatchById(Arrays.asList(category));
         return R.ok();
     }
 
@@ -76,7 +82,11 @@ public class CategoryController {
     @RequestMapping("/delete")
     //@RequiresPermissions("product:category:delete")
     public R delete(@RequestBody Long[] catIds){
-		categoryService.removeByIds(Arrays.asList(catIds));
+
+		//categoryService.removeByIds(Arrays.asList(catIds));
+        //检查单前的菜单是否被别的地方引用
+
+        categoryService.removeMenuByIds(Arrays.asList(catIds));
 
         return R.ok();
     }
